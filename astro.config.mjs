@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://keonil.github.io',
+  site: 'https://ai-blog-repo.vercel.app',
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
