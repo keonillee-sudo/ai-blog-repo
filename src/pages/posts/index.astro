@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PostCard from '@/components/PostCard.astro';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const sorted = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const tag = Astro.url.searchParams.get('tag');
+const filtered = tag ? sorted.filter(p => p.data.tags.includes(tag)) : sorted;
+
+const allTags = [...new Set(allPosts.flatMap(p => p.data.tags))].sort();
+---
+
+<BaseLayout title="Posts">
+  <h1>Posts</h1>
+
+  <div class="tag-filter">
+    <a href="/posts" class:list={['tag', { active: !tag }]}>All</a>
+    {allTags.map(t => (
+      <a href={`/posts?tag=${t}`} class:list={['tag', { active: tag === t }]}>{t}</a>
+    ))}
+  </div>
+
+  <div class="list">
+    {filtered.map(post => (
+      <PostCard
+        title={post.data.title}
+        date={post.data.date}
+        tags={post.data.tags}
+        description={post.data.description}
+        slug={post.slug}
+      />
+    ))}
+    {filtered.length === 0 && <p class="empty">No posts with tag "{tag}".</p>}
+  </div>
+</BaseLayout>
+
+<style>
+  h1 { margin-top: 0; }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .tag.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .empty {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+  }
+</style>

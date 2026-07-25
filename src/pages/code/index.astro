@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SnippetCard from '@/components/SnippetCard.astro';
+
+const allSnippets = await getCollection('snippets');
+const sorted = allSnippets.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const allTags = [...new Set(allSnippets.flatMap(s => s.data.tags))].sort();
+const allLangs = [...new Set(allSnippets.map(s => s.data.language))].sort();
+---
+
+<BaseLayout title="Code Showcase">
+  <h1>Code showcase</h1>
+  <p class="subtitle">Interesting snippets — mostly AI-adjacent utilities and experiments.</p>
+
+  <div class="filters">
+    <span class="filter-label">Language:</span>
+    {allLangs.map(lang => (
+      <span class="tag">{lang}</span>
+    ))}
+  </div>
+
+  <div class="list">
+    {sorted.map(snippet => (
+      <SnippetCard
+        title={snippet.data.title}
+        date={snippet.data.date}
+        language={snippet.data.language}
+        tags={snippet.data.tags}
+        description={snippet.data.description}
+        slug={snippet.slug}
+      />
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  h1 { margin-top: 0; }
+  .subtitle {
+    color: var(--text-secondary);
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+  .filter-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-right: 0.25rem;
+  }
+</style>

@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const snippets = await getCollection('snippets');
+  return snippets.map(snippet => ({
+    params: { slug: snippet.slug },
+    props: { snippet },
+  }));
+}
+
+const { snippet } = Astro.props;
+const { Content } = await snippet.render();
+const formatted = snippet.data.date.toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<BaseLayout title={snippet.data.title} description={snippet.data.description}>
+  <article>
+    <header>
+      <div class="meta">
+        <span class="lang">{snippet.data.language}</span>
+        <time datetime={snippet.data.date.toISOString()}>{formatted}</time>
+      </div>
+      <h1>{snippet.data.title}</h1>
+      {snippet.data.description && <p class="desc">{snippet.data.description}</p>}
+      <div class="tags">
+        {snippet.data.tags.map(tag => <span class="tag">{tag}</span>)}
+      </div>
+    </header>
+    <hr />
+    <div class="prose">
+      <Content />
+    </div>
+    <hr />
+    <a href="/code" class="back">← Code showcase</a>
+  </article>
+</BaseLayout>
+
+<style>
+  header { margin-bottom: 0 }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+  .lang {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 7px;
+    color: var(--text-secondary);
+  }
+  time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  h1 {
+    margin: 0.2rem 0 0.5rem;
+    font-size: 1.6rem;
+  }
+  .desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0 0 0.75rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+  .back {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+  .back:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>

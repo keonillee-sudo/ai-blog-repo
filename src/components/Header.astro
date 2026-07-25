@@ -1,0 +1,58 @@
+---
+import { SITE } from '@/config';
+const { pathname } = Astro.url;
+---
+
+<header>
+  <div class="inner">
+    <a href="/" class="site-name">{SITE.name}</a>
+    <nav>
+      {SITE.nav.map(({ label, href }) => (
+        <a href={href} class:list={['nav-link', { active: pathname.startsWith(href) }]}>
+          {label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+  }
+  .inner {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .site-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .site-name:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .nav-link {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.1s;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+</style>
